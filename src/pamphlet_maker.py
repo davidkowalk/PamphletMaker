@@ -1,4 +1,5 @@
 from PyPDF2 import PdfFileReader, PdfFileWriter
+from sys import argv
 
 def display_error(message, exit_after = True):
     print(message)
@@ -85,7 +86,11 @@ def test_sequence():
 def main():
 
     in_path = input("File: ")
-    writer = rearange_pdf(in_path)
+
+    if len(argv) > 1 and argv[1] == "-p":
+        writer = rearange_pdf_padded(in_path)
+    else:
+        writer = rearange_pdf(in_path)
 
     out_path = input("Output: ")
     with open(out_path, "wb") as file:
