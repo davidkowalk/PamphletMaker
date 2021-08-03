@@ -6,13 +6,24 @@ def display_error(message, exit_after = True):
     if exit_after:
         exit()
 
+def __generate_rearanged__(pdf_object, document_length):
+
+
+    pdf_writer = PdfFileWriter()
+    sequence = generate_squence(document_length)
+
+    for page in sequence:
+        pdf_writer.addPage(pdf_object.getPage(page))
+
+    return pdf_writer
+
+
 def rearange_pdf(path):
 
     """
     Takes pdf-path, rearanges the pages and returns pdf-writer object.
     """
 
-    pdf_writer = PdfFileWriter()
     pdf_reader = PdfFileReader(path)
 
     document_length = pdf_reader.getNumPages()
@@ -21,12 +32,26 @@ def rearange_pdf(path):
     if document_length % 4 != 0:
         display_error("The page-count of your document must be divisible by 4")
 
-    sequence = generate_squence(document_length)
+    return __generate_rearanged__(pdf_reader, document_length)
 
-    for page in sequence:
-        pdf_writer.addPage(pdf_reader.getPage(page))
+def rearange_pdf_padded(path):
 
-    return pdf_writer
+    """
+    Takes pdf-path, pads blank pages onto the end until it is divisible by 4 before rearanging the pdf to fit the pamphlet format.
+    Returns: pdf-writer object.
+    """
+
+    pdf_reader = PdfFileReader(path)
+    pdf_padded = PdfFileWriter()
+
+    pdf_padded.appendPagesFromReader(pdf_reader)
+    n = 4-pdf_reader.getNumPages()%4
+
+    for i in range(n):
+        pdf_padded.addBlankPage()
+
+    return __generate_rearanged__(pdf_padded, pdf_padded.getNumPages())
+
 
 
 def generate_squence(pages):
